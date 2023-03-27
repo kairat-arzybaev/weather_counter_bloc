@@ -78,7 +78,10 @@ class MyHomePage extends StatelessWidget {
                 BlocBuilder<CounterBloc, int>(
                   builder: (context, count) {
                     return Text('$count',
-                        style: Theme.of(context).textTheme.displayMedium);
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium
+                            ?.copyWith(color: Colors.black));
                   },
                 ),
               ],
