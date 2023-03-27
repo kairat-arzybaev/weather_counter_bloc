@@ -7,10 +7,14 @@ part 'counter_state.dart';
 class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0) {
     on<Increment>((event, emit) {
-      emit(state + 1);
+      if (state < 10) {
+        emit(state + 1);
+      }
     });
     on<Decrement>((event, emit) {
-      emit(state - 1);
+      if (state > 0) {
+        emit(state - 1);
+      }
     });
   }
 }
