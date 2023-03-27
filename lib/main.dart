@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_counter_bloc/app_events.dart';
-import 'package:weather_counter_bloc/app_states.dart';
+import 'package:weather_counter_bloc/bloc/weather_events.dart';
+import 'package:weather_counter_bloc/bloc/weather_states.dart';
 import 'package:weather_counter_bloc/bloc/counter_bloc.dart';
+import 'package:weather_counter_bloc/bloc/theme_state.dart';
 import 'package:weather_counter_bloc/data_repository.dart';
 
-import 'app_blocs.dart';
+import 'bloc/weather_bloc.dart';
+import 'bloc/theme_bloc.dart';
+import 'bloc/theme_event.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,18 +25,23 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) =>
-                AppBlocs(RepositoryProvider.of<DataRepository>(context)),
+                WeatherBloc(RepositoryProvider.of<DataRepository>(context)),
           ),
           BlocProvider(
             create: (context) => CounterBloc(),
           ),
-        ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+          BlocProvider(
+            create: (context) => ThemeBloc(),
           ),
-          home: const MyHomePage(title: 'Weather Counter'),
+        ],
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, state) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: state.themeData,
+              home: const MyHomePage(title: 'Weather Counter'),
+            );
+          },
         ),
       ),
     );
@@ -58,7 +66,7 @@ class MyHomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                BlocBuilder<AppBlocs, AppStates>(
+                BlocBuilder<WeatherBloc, WeatherState>(
                   builder: (context, state) {
                     if (state is WeatherLoadedState) {
                       return Text(
@@ -98,7 +106,7 @@ class MyHomePage extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     onPressed: () {
-                      BlocProvider.of<AppBlocs>(context)
+                      BlocProvider.of<WeatherBloc>(context)
                           .add(LoadWeatherEvent(DataRepository()));
                     },
                     tooltip: 'Location & Weather',
@@ -116,10 +124,19 @@ class MyHomePage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  FloatingActionButton(
-                    onPressed: () {},
-                    tooltip: 'Theme mode',
-                    child: const Icon(Icons.dark_mode),
+                  BlocBuilder<ThemeBloc, ThemeState>(
+                    builder: (context, state) {
+                      return FloatingActionButton(
+                        onPressed: () {
+                          BlocProvider.of<ThemeBloc>(context)
+                              .add(ToggleTheme());
+                        },
+                        tooltip: 'Theme mode',
+                        child: Icon(state.themeData == ThemeData.light
+                            ? Icons.nightlight_round
+                            : Icons.wb_sunny),
+                      );
+                    },
                   ),
                   FloatingActionButton(
                     onPressed: () {

@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:weather_counter_bloc/data_repository.dart';
 
-abstract class AppEvents extends Equatable {
-  const AppEvents();
+abstract class WeatherEvent extends Equatable {
+  const WeatherEvent();
 }
 
-class LoadWeatherEvent extends AppEvents {
+class LoadWeatherEvent extends WeatherEvent {
   final DataRepository repo;
 
   const LoadWeatherEvent(this.repo);

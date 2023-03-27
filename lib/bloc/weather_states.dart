@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:weather_counter_bloc/models/city_weather_model.dart';
 
-abstract class AppStates extends Equatable {}
+abstract class WeatherState extends Equatable {}
 
 // weather data loading state
-class WeatherLoadingState extends AppStates {
+class WeatherLoadingState extends WeatherState {
   @override
   List<Object> get props => [];
 }
 
 // weather data loaded state
-class WeatherLoadedState extends AppStates {
+class WeatherLoadedState extends WeatherState {
   WeatherLoadedState(this.cityWeather);
 
   final CityWeatherModel cityWeather;
@@ -19,7 +19,7 @@ class WeatherLoadedState extends AppStates {
 }
 
 // weather data loading error state
-class WeatherErrorState extends AppStates {
+class WeatherErrorState extends WeatherState {
   WeatherErrorState(this.error);
 
   final String error;
