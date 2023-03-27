@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_counter_bloc/app_events.dart';
 import 'package:weather_counter_bloc/app_states.dart';
+import 'package:weather_counter_bloc/bloc/counter_bloc.dart';
 import 'package:weather_counter_bloc/data_repository.dart';
 
 import 'app_blocs.dart';
@@ -17,9 +18,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider(
       create: (context) => DataRepository(),
-      child: BlocProvider(
-        create: (context) =>
-            AppBlocs(RepositoryProvider.of<DataRepository>(context)),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                AppBlocs(RepositoryProvider.of<DataRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) => CounterBloc(),
+          ),
+        ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
@@ -32,36 +40,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(widget.title),
+          title: Text(title),
         ),
         body: Center(
           child: SizedBox(
@@ -71,13 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 BlocBuilder<AppBlocs, AppStates>(
                   builder: (context, state) {
-                    if (state is WeatherLoadingState) {
-                      const CircularProgressIndicator();
-                    }
                     if (state is WeatherLoadedState) {
                       return Text(
                         'Weather for ${state.cityWeather.sys?.country}, ${state.cityWeather.name} is ${state.cityWeather.main?.temp?.toStringAsFixed(0)} C',
-                        style: const TextStyle(fontSize: 20),
+                        style:
+                            const TextStyle(fontSize: 24, color: Colors.purple),
                       );
                     }
 
@@ -87,13 +74,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 ),
-                const Text(
-                  'You have pushed the button this many times:',
-                  style: TextStyle(fontSize: 20),
-                ),
-                Text(
-                  '$_counter',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                const Text('You have pushed the button this many times'),
+                BlocBuilder<CounterBloc, int>(
+                  builder: (context, count) {
+                    return Text('$count',
+                        style: Theme.of(context).textTheme.displayMedium);
+                  },
                 ),
               ],
             ),
@@ -116,7 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: const Icon(Icons.location_on),
                   ),
                   FloatingActionButton(
-                    onPressed: _incrementCounter,
+                    onPressed: () {
+                      BlocProvider.of<CounterBloc>(context).add(Increment());
+                    },
                     tooltip: 'Increment',
                     child: const Icon(Icons.add),
                   ),
@@ -131,7 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: const Icon(Icons.dark_mode),
                   ),
                   FloatingActionButton(
-                    onPressed: _decrementCounter,
+                    onPressed: () {
+                      BlocProvider.of<CounterBloc>(context).add(Decrement());
+                    },
                     tooltip: 'Decrement',
                     child: const Icon(Icons.remove),
                   ),
