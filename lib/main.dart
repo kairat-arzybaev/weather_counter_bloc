@@ -112,12 +112,19 @@ class MyHomePage extends StatelessWidget {
                     tooltip: 'Location & Weather',
                     child: const Icon(Icons.location_on),
                   ),
-                  FloatingActionButton(
-                    onPressed: () {
-                      BlocProvider.of<CounterBloc>(context).add(Increment());
+                  BlocBuilder<CounterBloc, int>(
+                    builder: (context, count) {
+                      return count < 10
+                          ? FloatingActionButton(
+                              onPressed: () {
+                                BlocProvider.of<CounterBloc>(context)
+                                    .add(Increment());
+                              },
+                              tooltip: 'Increment',
+                              child: const Icon(Icons.add),
+                            )
+                          : const SizedBox.shrink();
                     },
-                    tooltip: 'Increment',
-                    child: const Icon(Icons.add),
                   ),
                 ],
               ),
@@ -129,7 +136,7 @@ class MyHomePage extends StatelessWidget {
                       return FloatingActionButton(
                         onPressed: () {
                           BlocProvider.of<ThemeBloc>(context)
-                              .add(ToggleTheme());
+                              .add(const ToggleTheme());
                         },
                         tooltip: 'Theme mode',
                         child: Icon(state.themeData == ThemeData.light
@@ -138,12 +145,19 @@ class MyHomePage extends StatelessWidget {
                       );
                     },
                   ),
-                  FloatingActionButton(
-                    onPressed: () {
-                      BlocProvider.of<CounterBloc>(context).add(Decrement());
+                  BlocBuilder<CounterBloc, int>(
+                    builder: (context, count) {
+                      return count > 0
+                          ? FloatingActionButton(
+                              onPressed: () {
+                                BlocProvider.of<CounterBloc>(context)
+                                    .add(Decrement());
+                              },
+                              tooltip: 'Decrement',
+                              child: const Icon(Icons.remove),
+                            )
+                          : const SizedBox.shrink();
                     },
-                    tooltip: 'Decrement',
-                    child: const Icon(Icons.remove),
                   ),
                 ],
               ),
